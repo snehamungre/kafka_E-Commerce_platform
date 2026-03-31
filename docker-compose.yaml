@@ -53,27 +53,12 @@ services:
     volumes:
       - kafka2_kraft:/var/lib/kafka/data
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.8.3
-    container_name: schema-registry
-    depends_on:
-      - kafka1
-      - kafka2
-    ports:
-      - "8081:8081"
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:9093,kafka2:9093
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-  
-  
   kafka-init:
     image: confluentinc/cp-kafka:7.8.3
     container_name: kafka-init
     depends_on:
       - kafka1
       - kafka2
-      - schema-registry
     entrypoint: ["/bin/sh", "-c"]
     command: |
       "
@@ -84,9 +69,6 @@ services:
       kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic orders --partitions 3 --replication-factor 2
       kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic payments --partitions 3 --replication-factor 2
       kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic shipments --partitions 3 --replication-factor 2
-      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic user_aggregates --partitions 3 --replication-factor 2
-      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic revenue_metrics --partitions 3 --replication-factor 2
-      kafka-topics --bootstrap-server kafka1:9093 --create --if-not-exists --topic error_events --partitions 3 --replication-factor 2
 
       echo 'All topics created.'
       kafka-topics --bootstrap-server kafka1:9093 --list
