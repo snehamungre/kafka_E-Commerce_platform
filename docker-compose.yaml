@@ -1,7 +1,7 @@
 services:
-  kafka:
+  kafka1:
     image: confluentinc/cp-kafka:7.8.3
-    container_name: kafka
+    container_name: kafka1
     ports:
       - "9092:9092"
 
@@ -9,11 +9,11 @@ services:
       KAFKA_KRAFT_MODE: 'true'
 
       CLUSTER_ID: 'wcHfOT7wSd+ol0XGJj9M5A'
-      KAFKA_NODE_ID: 1 
+      KAFKA_NODE_ID: 1
 
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9093,2@kafka2:9095
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
 
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
@@ -22,7 +22,34 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
 
     volumes:
-      - kafka_kraft:/var/lib/kafka/data
+      - kafka1_kraft:/var/lib/kafka/data
+  
+  kafka2:
+    image: confluentinc/cp-kafka:7.8.3
+    container_name: kafka2
+    ports:
+      - "9094:9094"
+
+    environment:
+      KAFKA_KRAFT_MODE: 'true'
+
+      CLUSTER_ID: 'wcHfOT7wSd+ol0XGJj9M5A'
+      KAFKA_NODE_ID: 2
+
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:9093,2@kafka2:9095
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9094,CONTROLLER://0.0.0.0:9095
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+  
+
+    volumes:
+      - kafka2_kraft:/var/lib/kafka/data
 
 volumes:
-  kafka_kraft:
+  kafka1_kraft:
+  kafka2_kraft:
