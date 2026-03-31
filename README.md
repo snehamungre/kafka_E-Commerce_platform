@@ -4,6 +4,9 @@
 ## 📌 Project Overview
 This project demonstrates a scalable Kafka-based pipeline simulating an e-commerce system. It handles order validation and notification services with a focus on partitioning correctness, consumer group scalability, and high availability.
 
+![Kafka Pipeline](screenshots/Ecommerce-Kafka-Pipeline.svg)
+
+
 ---
 
 ## 🛠 Cluster Creation and Configuration
@@ -69,7 +72,7 @@ To test the resilience of the system, we simulated a broker failure.
     * Broker 1 took over leadership for all partitions.
     * **No data was lost**, and processing continued seamlessly.
 
-###Broker Failover
+### Broker Failover
 
 ![Kafka Down.py](screenshots/kafka2_down.png)
 Showing the fact that only one cluster was up
@@ -107,7 +110,6 @@ docker exec -it kafka1 kafka-consumer-groups --bootstrap-server localhost:9092 -
 
 ## 📝 Key Learnings
 * **Horizontal Scaling:** Learned how adding consumers to a group increases throughput by sharing partition load.
-* **KRaft Quorum:** Configured a controller quorum to manage metadata without Zookeeper.
 * **Data Integrity:** Validated that using keys prevents "race conditions" where an order update might be processed before the order creation.
 
 ---
