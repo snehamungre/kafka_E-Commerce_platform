@@ -1,18 +1,17 @@
-import json
-
 from confluent_kafka import Consumer
+import json
 
 consumer_config = {
     "bootstrap.servers": "localhost:9092",
-    "group.id": "payments",
+    "group.id": "notification-group",
     "auto.offset.reset": "earliest",
 }
+
+
 
 consumer = Consumer(consumer_config)
 
 consumer.subscribe(["orders"])
-
-print("🟢 Payments is running and subscribed to orders topic")
 
 try:
     while True:
@@ -20,16 +19,16 @@ try:
         if msg is None:
             continue
         if msg.error():
-            print("❌ Error:", msg.error())
+            print("Error:", msg.error())
             continue
 
         value = msg.value().decode("utf-8")
         order = json.loads(value)
-        
-        #TODO
-
+        print(
+            f"🔔 Notification sent to {order['user']}:  Your order for {order['quantity']} x {order['item']} as been received!"
+        )
 except KeyboardInterrupt:
-    print("\n🔴 Stopping Payments")
+    print("\n🔴 Stopping Notificaion Service")
 
 finally:
     consumer.close()

@@ -1,4 +1,6 @@
 import json
+import random
+import time
 import uuid
 from confluent_kafka import Producer
 
@@ -11,14 +13,40 @@ def delivery_report(err, msg):
     if err:
         print(f"Delivery failed: {err}")
     else:
-        print(f"Delivered {msg.value().decode("utf-8")}")
         print(f"Delivered to: {msg.topic()} and partition {msg.partition()}")
 
 
-order = {"order_id": str(uuid.uuid4()), "user": "man", "item": "pen", "quantity": 1}
+# order = {"order_id": str(uuid.uuid4()), "user": "man", "item": "pen", "quantity": 1}
 
-value = json.dumps(order).encode("utf-8")
+for i in range(1, 101):
+    order_id = str(uuid.uuid4())
+    data = {
+        "order_id": order_id,
+        "user": f"user_{random.randint(1, 50)}",
+        "item": random.choice(
+            [
+                "Laptop",
+                "Mouse",
+                "Keyboard",
+                "Monitor",
+                "Phone",
+                "PC",
+                "Wireless Headphones",
+                "Wired Headphones",
+            ]
+        ),
+        "price": random.randint(100, 5000),
+        "quantity": random.randint(1, 5),
+        "timestamp": time.time(),
+        "category": "Electronics",
+    }
 
-producer.produce(topic="order", value=value, callback=delivery_report)
+    # Send data using order_id as the KEY
+    producer.produce(
+        topic="orders",
+        key=order_id,
+        value=json.dumps(data).encode("utf-8"),
+        callback=delivery_report,
+    )
 
 producer.flush()

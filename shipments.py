@@ -4,13 +4,13 @@ from confluent_kafka import Consumer
 
 consumer_config = {
     "bootstrap.servers": "localhost:9092",
-    "group.id": "payments",
+    "group.id": "shipments",
     "auto.offset.reset": "earliest",
 }
 
 consumer = Consumer(consumer_config)
 
-consumer.subscribe(["order"])
+consumer.subscribe(["orders"])
 
 print("Shipments is running and subscribed to orders topic")
 
@@ -25,9 +25,8 @@ try:
 
         value = msg.value().decode("utf-8")
         order = json.loads(value)
-        print(
-            f"📦 Received order: {order['quantity']} x {order['item']} from {order['user']}"
-        )
+
+        # TODO
 except KeyboardInterrupt:
     print("\n🔴 Stopping Shipping")
 
