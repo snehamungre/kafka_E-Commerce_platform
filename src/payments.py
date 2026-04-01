@@ -3,13 +3,12 @@ import random
 
 from confluent_kafka import Consumer, Producer
 
-consumer_config = {
-    "bootstrap.servers": "localhost:9092",
-    "group.id": "payments",
-    "auto.offset.reset": "earliest",
-}
+from config import CONSUMER_DEFAULTS, PRODUCER_DEFAULTS
 
-producer_config = {"bootstrap.servers": "localhost:9092"}
+consumer_config = {
+    **CONSUMER_DEFAULTS,
+    "group.id": "payments",
+}
 
 
 def delivery_report(err, msg):
@@ -17,7 +16,7 @@ def delivery_report(err, msg):
         print(f"Delivery failed: {err}")
 
 
-producer = Producer(producer_config)
+producer = Producer(**PRODUCER_DEFAULTS)
 consumer = Consumer(consumer_config)
 
 consumer.subscribe(["orders"])
@@ -42,7 +41,7 @@ try:
 
         payment_success = random.random() < 0.8
 
-        if payment_success:
+        if payment_success and total > 0:
             producer.produce(
                 topic="payments",
                 key=order["order_id"],
